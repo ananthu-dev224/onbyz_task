@@ -1,4 +1,4 @@
-cat << 'EOF' > README.md
+
 # 📌 URL Shortener & SMS Management System
 
 A full-stack application that provides:
