@@ -1,9 +1,14 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+
 import { errorHandler } from "./middlewares/error.middleware.js";
+
 import authRoutes from "./modules/auth/auth.routes.js";
 import urlRoutes from "./modules/url/url.routes.js";
+import smsTemplateRoutes from "./modules/sms/smsTemplate.routes.js";
+import smsRoutes from "./modules/sms/sms.routes.js";
+
 import { redirectShortUrl } from "./modules/url/url.controller.js";
 
 const app = express();
@@ -24,6 +29,8 @@ app.get("/health", (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/urls", urlRoutes);
+app.use("/api/sms", smsTemplateRoutes);
+app.use("/api/sms", smsRoutes);
 
 // Public Redirect Route
 app.get("/:shortCode", redirectShortUrl);
