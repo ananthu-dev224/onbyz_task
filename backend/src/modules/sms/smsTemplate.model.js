@@ -6,7 +6,6 @@ const smsTemplateSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true,
     },
     content: {
       type: String,
@@ -22,6 +21,11 @@ const smsTemplateSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+);
+
+smsTemplateSchema.index(
+  { name: 1, createdBy: 1 },
+  { unique: true }
 );
 
 export const SmsTemplate = mongoose.model(
