@@ -1,6 +1,6 @@
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
-import { connectRedis } from "./config/redis.js";
+// import { connectRedis } from "./config/redis.js";
 import { env } from "./config/env.js";
 
 // Start server

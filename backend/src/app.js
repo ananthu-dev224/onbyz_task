@@ -4,6 +4,7 @@ import morgan from "morgan";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import urlRoutes from "./modules/url/url.routes.js";
+import { redirectShortUrl } from "./modules/url/url.controller.js";
 
 const app = express();
 
@@ -23,6 +24,9 @@ app.get("/health", (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/urls", urlRoutes);
+
+// Public Redirect Route
+app.get("/:shortCode", redirectShortUrl);
 
 // Error Handler
 app.use(errorHandler);

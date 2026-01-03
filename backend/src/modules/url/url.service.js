@@ -1,13 +1,11 @@
 import { Url } from "./url.model.js";
 import { generateShortCode } from "../../utils/shortCode.js";
 
-// createShortUrlService creates a new short URL or returns existing one
+// Create short URL
 export const createShortUrlService = async ({
   originalUrl,
   userId,
-  expiresAt,
 }) => {
-  // Check if URL already exists for this user
   const existingUrl = await Url.findOne({
     originalUrl,
     createdBy: userId,
@@ -20,7 +18,6 @@ export const createShortUrlService = async ({
   let shortCode;
   let isUnique = false;
 
-  // Ensure unique shortCode
   while (!isUnique) {
     shortCode = generateShortCode();
     const codeExists = await Url.findOne({ shortCode });
@@ -31,8 +28,20 @@ export const createShortUrlService = async ({
     originalUrl,
     shortCode,
     createdBy: userId,
-    expiresAt: expiresAt || null,
   });
 
   return url;
+};
+
+// Get URL by short code
+export const getUrlByShortCodeService = async (shortCode) => {
+  return await Url.findOne({ shortCode });
+};
+
+// Track click on short URL
+export const trackClickService = async (urlId) => {
+  await Url.findByIdAndUpdate(urlId, {
+    $inc: { clickCount: 1 },
+    lastAccessedAt: new Date(),
+  });
 };

@@ -1,9 +1,13 @@
-import { createShortUrlService } from "./url.service.js";
-import { redisClient } from "../../config/redis.js";
+import {
+  createShortUrlService,
+  getUrlByShortCodeService,
+  trackClickService,
+} from "./url.service.js";
 
+// Create short URL
 export const createShortUrl = async (req, res, next) => {
   try {
-    const { originalUrl, expiresAt } = req.body;
+    const { originalUrl } = req.body;
 
     if (!originalUrl) {
       return res.status(400).json({
@@ -15,14 +19,7 @@ export const createShortUrl = async (req, res, next) => {
     const url = await createShortUrlService({
       originalUrl,
       userId: req.user.id,
-      expiresAt,
     });
-
-    // Cache shortCode → originalUrl
-    // await redisClient.set(
-    //   `short:${url.shortCode}`,
-    //   url.originalUrl
-    // );
 
     res.status(201).json({
       success: true,
@@ -31,11 +28,61 @@ export const createShortUrl = async (req, res, next) => {
         originalUrl: url.originalUrl,
         shortCode: url.shortCode,
         shortUrl: `${req.protocol}://${req.get("host")}/${url.shortCode}`,
-        expiresAt: url.expiresAt,
       },
     });
   } catch (error) {
-    error.statusCode = 400;
+    next(error);
+  }
+};
+
+// Redirect short URL
+export const redirectShortUrl = async (req, res, next) => {
+  try {
+    const { shortCode } = req.params;
+
+    const url = await getUrlByShortCodeService(shortCode);
+
+    if (!url) {
+      return res.status(404).json({
+        success: false,
+        message: "Short URL not found",
+      });
+    }
+
+    // Increment click count
+    trackClickService(url._id);
+
+    return res.redirect(url.originalUrl);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get URL analytics
+export const getUrlAnalytics = async (req, res, next) => {
+  try {
+    const { shortCode } = req.params;
+
+    const url = await getUrlByShortCodeService(shortCode);
+
+    if (!url) {
+      return res.status(404).json({
+        success: false,
+        message: "Short URL not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        originalUrl: url.originalUrl,
+        shortCode: url.shortCode,
+        clickCount: url.clickCount,
+        lastAccessedAt: url.lastAccessedAt,
+        createdAt: url.createdAt,
+      },
+    });
+  } catch (error) {
     next(error);
   }
 };

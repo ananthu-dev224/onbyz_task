@@ -20,9 +20,6 @@ const urlSchema = new mongoose.Schema(
     lastAccessedAt: {
       type: Date,
     },
-    expiresAt: {
-      type: Date,
-    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -32,7 +29,7 @@ const urlSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Prevent duplicate short URLs for same user + original URL
+// Ensure unique originalUrl per user
 urlSchema.index({ originalUrl: 1, createdBy: 1 }, { unique: true });
 
 export const Url = mongoose.model("Url", urlSchema);
