@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import { errorHandler } from "./middlewares/error.middleware.js";
+import authRoutes from "./modules/auth/auth.routes.js";
 
 const app = express();
 
@@ -17,6 +18,9 @@ app.get("/health", (req, res) => {
     message: "API is running...",
   });
 });
+
+// Auth Routes
+app.use("/api/auth", authRoutes);
 
 // Error Handler
 app.use(errorHandler);
